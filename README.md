@@ -1,2 +1,0 @@
-# Proyecto-de-grado
-PDG
