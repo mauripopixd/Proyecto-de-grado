@@ -58,3 +58,40 @@ def clasificar(texto, modelo, lm=None):
             "tiempo_ms": round((time.perf_counter() - t0) * 1000, 1),
             "modelo_demo": demo,
             "advertencia": ADVERTENCIA_DEMO if demo else ADVERTENCIA}
+
+
+def clasificar_documento(texto, modelo, lm=None):
+    """Analiza un documento completo: lo divide en bloques de ~500 palabras y promedia el puntaje."""
+    from . import documentos
+    t0 = time.perf_counter()
+    if modelo is None:
+        raise ErrorApi("modelo_no_disponible", "El modelo aún no está entrenado.", 503)
+    pal = features.palabras(texto)
+    if len(pal) < MIN_PALABRAS:
+        raise ErrorApi("texto_corto", f"El documento tiene menos de {MIN_PALABRAS} palabras.")
+    bloques, truncado = documentos.dividir_bloques(texto)   # el idioma se verifica bloque a bloque
+    resultados, omitidos = [], 0
+    for i, b in enumerate(bloques, 1):
+        try:
+            r = clasificar(b, modelo, lm)
+        except ErrorApi as e:
+            if e.codigo in ("idioma_no_espanol", "texto_corto", "texto_largo", "caracteristicas_invalidas"):
+                omitidos += 1
+                continue
+            raise
+        resultados.append({"bloque": i, "palabras": r["num_palabras"], "puntaje_ia": r["puntaje_ia"], "etiqueta": r["etiqueta"]})
+    if not resultados:
+        if omitidos and not es_espanol(pal):
+            raise ErrorApi("idioma_no_espanol", "El documento no parece tener texto corrido en español (¿es una lista de referencias, una tabla, código o está en otro idioma?).")
+        raise ErrorApi("sin_bloques_analizables", "No se pudo analizar ningún fragmento del documento: "
+                       "verifique que tenga párrafos de texto en español (no solo tablas, código o referencias).")
+    total = sum(r["palabras"] for r in resultados)
+    media = sum(r["puntaje_ia"] * r["palabras"] for r in resultados) / total
+    demo = bool(modelo.get("demo", False))
+    return {"puntaje_ia": round(media, 4),
+            "etiqueta": modeling.etiquetar(media, modelo["umbral_bajo"], modelo["umbral_alto"]),
+            "num_palabras": len(pal), "palabras_analizadas": total,
+            "bloques": resultados, "bloques_omitidos": omitidos, "truncado": truncado,
+            "tiempo_ms": round((time.perf_counter() - t0) * 1000, 1),
+            "modelo_demo": demo,
+            "advertencia": ADVERTENCIA_DEMO if demo else ADVERTENCIA}

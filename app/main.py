@@ -3,12 +3,14 @@ Arranque: uvicorn app.main:app"""
 import os
 
 import joblib
-from fastapi import FastAPI, Request
+from pathlib import Path
+
+from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 
-from . import servicio
+from . import documentos, servicio
 
 
 class Solicitud(BaseModel):
@@ -47,6 +49,15 @@ def crear_app(modelo=None, lm=None, modelo_path=None):
     def clasificar(s: Solicitud):
         m = cargar()
         return servicio.clasificar(s.texto, m, estado["lm"])
+
+    @app.post("/clasificar-archivo")
+    async def clasificar_archivo(archivo: UploadFile = File(...)):
+        texto = documentos.leer_documento(archivo.filename, await archivo.read())
+        return servicio.clasificar_documento(texto, cargar(), estado["lm"])
+
+    @app.get("/", response_class=HTMLResponse, include_in_schema=False)
+    def inicio():
+        return (Path(__file__).parent / "static" / "index.html").read_text(encoding="utf-8")
 
     return app
 

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Detector de texto generado por IA (prototipo)</title>
+<style>
+  :root { --tinta:#1f2933; --suave:#5b6770; --linea:#d9dee3; --fondo:#f6f7f9; --acento:#1d4e89; --ok:#2f7d4f; --medio:#b7791f; --alto:#b3412e; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--fondo); color:var(--tinta); font:16px/1.5 system-ui,"Segoe UI",Roboto,sans-serif; }
+  main { max-width:760px; margin:0 auto; padding:32px 20px 56px; }
+  h1 { font-size:1.55rem; margin:0 0 4px; }
+  .sub { color:var(--suave); margin:0 0 24px; }
+  .aviso { border-left:4px solid var(--acento); background:#fff; padding:10px 14px; margin:0 0 24px; font-size:.92rem; }
+  .caja { background:#fff; border:1px solid var(--linea); border-radius:8px; padding:20px; margin-bottom:20px; }
+  label { font-weight:600; display:block; margin-bottom:6px; }
+  input[type=file] { width:100%; padding:10px; border:1px dashed var(--suave); border-radius:6px; background:var(--fondo); }
+  textarea { width:100%; min-height:140px; padding:10px; border:1px solid var(--linea); border-radius:6px; font:inherit; resize:vertical; }
+  .o { text-align:center; color:var(--suave); margin:12px 0; font-size:.9rem; }
+  button { background:var(--acento); color:#fff; border:0; border-radius:6px; padding:11px 22px; font:inherit; font-weight:600; cursor:pointer; }
+  button:disabled { opacity:.55; cursor:wait; }
+  .error { color:var(--alto); margin-top:12px; }
+  #resultado { display:none; }
+  .etiqueta { font-size:1.25rem; font-weight:700; margin:0 0 4px; }
+  .barra { position:relative; height:12px; background:linear-gradient(90deg,var(--ok),var(--medio),var(--alto)); border-radius:6px; margin:14px 0 4px; }
+  .marca { position:absolute; top:-5px; width:4px; height:22px; background:var(--tinta); border-radius:2px; }
+  .escala { display:flex; justify-content:space-between; color:var(--suave); font-size:.8rem; }
+  table { width:100%; border-collapse:collapse; margin-top:12px; font-size:.92rem; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--linea); }
+  .fuente { margin:14px 0 0; font-size:.92rem; color:var(--suave); }
+  .fuente strong { color:var(--tinta); }
+  .origen { color:var(--suave); font-size:.92rem; margin:0 0 8px; }
+  .nota { color:var(--suave); font-size:.88rem; margin-top:12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Detector de texto generado por IA</h1>
+  <p class="sub">Prototipo de proyecto de grado · Ingeniería de Sistemas, UNAD</p>
+  <p class="aviso"><strong>Resultado orientativo.</strong> Estima si un texto en español tiene características asociadas a la generación con IA; no prueba autoría ni sustenta una sanción. El documento se procesa en este equipo y no se guarda.</p>
+
+  <div class="caja">
+    <label for="archivo">Suba un documento (.docx, .pdf o .txt)</label>
+    <input id="archivo" type="file" accept=".docx,.pdf,.txt">
+    <div class="o">o pegue el texto</div>
+    <textarea id="texto" placeholder="Pegue aquí un texto en español (mínimo 100 palabras)"></textarea>
+    <p id="fuente" class="fuente"></p>
+    <p style="margin:12px 0 0"><button id="analizar">Analizar</button></p>
+    <div id="error" class="error" role="alert"></div>
+  </div>
+
+  <div id="resultado" class="caja">
+    <p id="origen" class="origen"></p>
+    <p id="etiqueta" class="etiqueta"></p>
+    <div id="detalle"></div>
+    <div class="barra"><div id="marca" class="marca"></div></div>
+    <div class="escala"><span>0 · humano</span><span>puntaje de IA</span><span>1 · IA</span></div>
+    <table id="tabla" hidden><thead><tr><th>Bloque</th><th>Palabras</th><th>Puntaje IA</th><th>Etiqueta</th></tr></thead><tbody></tbody></table>
+    <p id="nota" class="nota"></p>
+  </div>
+</main>
+<script>
+const NOMBRES = { baja_probabilidad_ia: ["Baja probabilidad de texto generado por IA", "var(--ok)"],
+                  indeterminado: ["Indeterminado: el resultado no permite concluir", "var(--medio)"],
+                  alta_probabilidad_ia: ["Alta probabilidad de texto generado por IA", "var(--alto)"] };
+const $ = id => document.getElementById(id);
+
+// Solo una fuente a la vez: elegir un archivo borra el texto pegado y escribir texto quita el archivo.
+function actualizarFuente() {
+  const f = $("archivo").files[0], t = $("texto").value.trim();
+  $("fuente").innerHTML = f ? "Se analizará el archivo: <strong></strong>" : (t ? "Se analizará el <strong>texto pegado</strong>" : "");
+  if (f) $("fuente").querySelector("strong").textContent = f.name;
+}
+$("archivo").addEventListener("change", () => { if ($("archivo").files[0]) $("texto").value = ""; actualizarFuente(); });
+$("texto").addEventListener("input", () => { if ($("texto").value) $("archivo").value = ""; actualizarFuente(); });
+
+$("analizar").addEventListener("click", async () => {
+  $("error").textContent = ""; $("resultado").style.display = "none";
+  const f = $("archivo").files[0], t = $("texto").value.trim();
+  if (!f && !t) { $("error").textContent = "Suba un archivo o pegue un texto."; return; }
+  const datos = new FormData();
+  const origen = f ? "Archivo analizado: " + f.name : "Texto pegado analizado";
+  if (f) datos.append("archivo", f);
+  else datos.append("archivo", new Blob([t], { type: "text/plain" }), "texto.txt");
+  const boton = $("analizar"); boton.disabled = true; boton.textContent = "Analizando… (la primera vez puede tardar un minuto)";
+  try {
+    const r = await fetch("/clasificar-archivo", { method: "POST", body: datos });
+    const d = await r.json();
+    if (!r.ok) { $("error").textContent = (d.error && d.error.mensaje) || "No se pudo analizar el documento."; return; }
+    mostrar(d, origen);
+  } catch (e) { $("error").textContent = "No se pudo conectar con el servicio."; }
+  finally { boton.disabled = false; boton.textContent = "Analizar"; }
+});
+
+function mostrar(d, origen) {
+  $("origen").textContent = origen;
+  const [texto, color] = NOMBRES[d.etiqueta] || [d.etiqueta, "var(--tinta)"];
+  $("etiqueta").textContent = texto; $("etiqueta").style.color = color;
+  $("detalle").textContent = "Puntaje de IA: " + d.puntaje_ia.toFixed(2) + " · " + d.palabras_analizadas + " palabras analizadas de " + d.num_palabras;
+  $("marca").style.left = "calc(" + (d.puntaje_ia * 100) + "% - 2px)";
+  const cuerpo = $("tabla").querySelector("tbody"); cuerpo.innerHTML = "";
+  d.bloques.forEach(b => {
+    const fila = cuerpo.insertRow();
+    [b.bloque, b.palabras, b.puntaje_ia.toFixed(2), (NOMBRES[b.etiqueta] || [b.etiqueta])[0]].forEach(v => fila.insertCell().textContent = v);
+  });
+  $("tabla").hidden = d.bloques.length < 2;
+  const notas = [d.advertencia];
+  if (d.truncado) notas.push("Solo se analizaron los primeros bloques del documento.");
+  if (d.bloques_omitidos) notas.push(d.bloques_omitidos + " fragmento(s) no se pudieron analizar (por ejemplo, por no estar en español).");
+  $("nota").textContent = notas.join(" ");
+  $("resultado").style.display = "block";
+}
+</script>
+</body>
+</html>

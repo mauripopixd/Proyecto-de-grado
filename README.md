@@ -9,8 +9,8 @@ Estima si un texto académico en español tiene características asociadas a su 
 | Aspecto | Detalle |
 | --- | --- |
 | Nivel de madurez declarado | TRL 4: componentes integrados y validados en laboratorio (equipo local). |
-| Qué incluye | API REST (`/salud`, `/clasificar`), extractor de 6 características, perplejidad con un GPT-2 en español, clasificador de regresión logística con línea base, umbrales calibrados («baja probabilidad», «indeterminado», «alta probabilidad»), 29 pruebas automáticas e informe de evaluación. |
-| Qué no incluye | Interfaz web, despliegue en servidor, validación con usuarios reales ni con textos mezclados (humano + IA). |
+| Qué incluye | Interfaz web para subir un documento (.docx, .pdf o .txt) o pegar un texto, API REST (`/salud`, `/clasificar`, `/clasificar-archivo`), extractor de 6 características, perplejidad con un GPT-2 en español, clasificador de regresión logística con línea base, umbrales calibrados («baja probabilidad», «indeterminado», «alta probabilidad»), 36 pruebas automáticas e informe de evaluación. |
+| Qué no incluye | Despliegue en servidor, validación con usuarios reales ni con textos mezclados (humano + IA). |
 | Corpus | No se publica (ver [Corpus](#corpus)). Sí se publican la ficha, los scripts que lo construyen y el modelo entrenado. |
 
 ## Resultados de la prueba de concepto
@@ -27,9 +27,18 @@ Con 4 textos de prueba, un solo acierto cambia las métricas de forma notable: *
 El detalle está en [`reports/informe.md`](reports/informe.md) y [`reports/metricas.json`](reports/metricas.json).
 Tiempo de respuesta medido en un portátil con GPU: unos 0,6 s para textos de 400 a 500 palabras (la primera petición tarda más porque carga el modelo de lenguaje).
 
-## Instalación
+## Inicio rápido (para quien quiere probar un documento)
 
-Requiere Python 3.10 o superior (probado con 3.13 en Windows 11) y conexión a internet la primera vez.
+Requiere [Python 3.10 o superior](https://www.python.org/downloads/) (probado con 3.13 en Windows 11) y conexión a internet la primera vez.
+
+1. Descargue el repositorio (botón verde **Code → Download ZIP**) y descomprímalo.
+2. **Windows:** haga doble clic en `iniciar.bat`. **Linux/Mac:** ejecute `./iniciar.sh`.
+3. Se abre el navegador en <http://127.0.0.1:8000>: suba un documento (.docx, .pdf o .txt) o pegue un texto y presione **Analizar**.
+
+La primera vez se instalan las dependencias y se descarga el modelo de lenguaje (unos 260 MB), así que puede tardar varios minutos. El documento se procesa en el propio equipo y no se guarda.
+Los documentos de más de 500 palabras se analizan por bloques de unas 500 palabras (hasta 10 bloques) y se muestra el puntaje promedio y el de cada bloque.
+
+## Instalación manual
 
 ```
 python -m venv .venv
@@ -47,7 +56,7 @@ El repositorio incluye `models/modelo.joblib`, entrenado con el corpus descrito 
 uvicorn app.main:app
 ```
 
-Abra <http://127.0.0.1:8000/docs> y use `POST /clasificar` con un texto en español de 100 a 1.000 palabras. También se puede usar el script de prueba, que envía archivos `.txt` y mide el tiempo:
+Abra <http://127.0.0.1:8000> para la interfaz web, o <http://127.0.0.1:8000/docs> para la API: `POST /clasificar` recibe un texto en español de 100 a 1.000 palabras y `POST /clasificar-archivo` recibe un archivo. También se puede usar el script de prueba, que envía archivos `.txt` y mide el tiempo:
 
 ```
 python probar_api.py ruta\al\texto.txt
@@ -76,7 +85,7 @@ Errores controlados: texto con menos de 100 o más de 1.000 palabras (422), text
 python -m pytest
 ```
 
-Son 29 pruebas (extractor, modelado, servicio y API) y se ejecutan sin descargar el modelo de lenguaje.
+Son 36 pruebas (extractor, modelado, servicio, lectura de documentos y API) y se ejecutan sin descargar el modelo de lenguaje.
 
 ## Modelo de demostración (opcional)
 
@@ -113,8 +122,8 @@ Los textos humanos son fragmentos de 250 a 500 palabras de trabajos de grado de 
 
 ## Estructura
 
-`app/` API, extractor, perplejidad, modelado y servicio · `scripts/` preparación del corpus, extracción, entrenamiento y modelo de demostración ·
-`tests/` pruebas · `reports/` informe de métricas · `models/` modelo entrenado · `data/` ficha del corpus · `probar_api.py` prueba de la API.
+`app/` API, interfaz web, lectura de documentos, extractor, perplejidad, modelado y servicio · `scripts/` preparación del corpus, extracción, entrenamiento y modelo de demostración ·
+`tests/` pruebas · `reports/` informe de métricas · `models/` modelo entrenado · `data/` ficha del corpus · `probar_api.py` prueba de la API · `iniciar.bat` / `iniciar.sh` arranque con un clic.
 
 ## Limitaciones
 
@@ -124,6 +133,7 @@ Los textos humanos son fragmentos de 250 a 500 palabras de trabajos de grado de 
 - Los textos humanos y los de IA vienen de fuentes distintas (PDF de repositorio frente a chat), por lo que el modelo podría estar aprendiendo diferencias de origen además del estilo.
 - Los resultados dependen de los asistentes y de la instrucción usada para generar los textos de IA.
 - El modelo de lenguaje de referencia inicial (`PlanTL-GOB-ES/gpt2-base-bne`) dejó de estar disponible en Hugging Face durante el proyecto y se reemplazó por `DeepESP/gpt2-spanish`.
+- El modelo se entrenó con fragmentos de 250 a 500 palabras; los documentos más largos se analizan por bloques y el promedio no se ha validado como medida del documento completo. Los PDF escaneados (imágenes) no se pueden leer.
 - Se ejecuta en local, sin despliegue; no debe usarse como evidencia única en procesos académicos o disciplinarios.
 
 ## Licencia
