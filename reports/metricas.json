@@ -1,0 +1,59 @@
+{
+  "n_entrenamiento": 16,
+  "n_prueba": 4,
+  "caracteristicas": [
+    "perplejidad_media",
+    "perplejidad_desv",
+    "palabras_distintas",
+    "long_oracion_media",
+    "long_oracion_desv",
+    "repeticion_trigramas"
+  ],
+  "umbral_bajo": 0.30019848922485126,
+  "umbral_alto": 0.8212123650393055,
+  "clasificador": {
+    "precision": 0.5,
+    "recall": 0.5,
+    "f1": 0.5,
+    "tasa_falsos_positivos": 0.5,
+    "matriz": {
+      "vn": 1,
+      "fp": 1,
+      "fn": 1,
+      "vp": 1
+    }
+  },
+  "validacion_cruzada": {
+    "precision": 0.7777777777777778,
+    "recall": 0.875,
+    "f1": 0.8235294117647058,
+    "tasa_falsos_positivos": 0.25,
+    "matriz": {
+      "vn": 6,
+      "fp": 2,
+      "fn": 1,
+      "vp": 7
+    }
+  },
+  "indeterminados_en_prueba": 1,
+  "coeficientes": {
+    "perplejidad_media": 0.10065346427674467,
+    "perplejidad_desv": -0.1456321484043146,
+    "palabras_distintas": 0.9433964294710807,
+    "long_oracion_media": -0.15622836197942408,
+    "long_oracion_desv": -1.2594704982982623,
+    "repeticion_trigramas": -0.5654618928037717
+  },
+  "linea_base": {
+    "precision": 0.6666666666666666,
+    "recall": 1.0,
+    "f1": 0.8,
+    "tasa_falsos_positivos": 0.5,
+    "matriz": {
+      "vn": 1,
+      "fp": 1,
+      "fn": 0,
+      "vp": 2
+    }
+  }
+}

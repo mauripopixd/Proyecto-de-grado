@@ -1,0 +1,21 @@
+id,clase,tema,palabras,origen,seccion,enlace,anio,asistente,version,fecha
+H01,humano,T01,458,H01_T01.pdf,"1.1-1.3 descripción, formulación y sistematización del problema",https://repository.unad.edu.co/handle/10596/1611,2013,,,
+H02,humano,T02,350,H02_T02.pdf,3.1 definición del problema (con justificación),https://repository.unad.edu.co/handle/10596/1610,2013,,,
+H03,humano,T03,414,H03_T03.pdf,introducción (el trabajo no tiene sección de problema),https://repository.unad.edu.co/handle/10596/1589,2013,,,
+H04,humano,T04,411,H04_T04.pdf,planteamiento del problema,https://repository.unad.edu.co/handle/10596/1539,2009,,,
+H05,humano,T05,399,H05_T05.pdf,2.1 descripción + 2.2 formulación + 6 justificación,https://repository.unad.edu.co/handle/10596/1516,2010,,,
+H06,humano,T06,404,H06_T06.pdf,planteamiento + justificación + introducción,https://repository.unad.edu.co/handle/10596/1538,2010,,,
+H07,humano,T07,473,H07_T07.pdf,2.1 descripción + 2.2 formulación + 6 justificación,https://repository.unad.edu.co/handle/10596/1536,2010,,,
+H08,humano,T08,342,H08_T08.pdf,planteamiento del problema,https://repository.unad.edu.co/handle/10596/1619,2012,,,
+H09,humano,T09,312,H09_T09.pdf,2 planteamiento + 2.1 formulación + 6 justificación,https://repository.unad.edu.co/handle/10596/1537,2010,,,
+H10,humano,T10,413,H10_T10.pdf,descripción del problema,https://repository.unad.edu.co/handle/10596/31409,2019,,,
+I01,ia,T01,437,I01_T01_chatgpt.pdf,,,,chatgpt,,2026-11-13
+I02,ia,T02,493,I02_T02_gemini.pdf,,,,gemini,,2026-11-13
+I03,ia,T03,445,I03_T03_chatgpt.pdf,,,,chatgpt,,2026-11-13
+I04,ia,T04,476,I04_T04_gemini.pdf,,,,gemini,,2026-11-13
+I05,ia,T05,457,I05_T05_chatgpt.pdf,,,,chatgpt,,2026-11-13
+I06,ia,T06,471,I06_T06_gemini.pdf,,,,gemini,,2026-11-13
+I07,ia,T07,450,I07_T07_chatgpt.pdf,,,,chatgpt,,2026-11-13
+I08,ia,T08,471,I08_T08_gemini.pdf,,,,gemini,,2026-11-13
+I09,ia,T09,480,I09_T09_chatgpt.pdf,,,,chatgpt,,2026-11-13
+I10,ia,T10,451,I10_T10_gemini.pdf,,,,gemini,,2026-11-13
