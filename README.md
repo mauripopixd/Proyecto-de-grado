@@ -8,9 +8,9 @@ Estima si un texto académico en español tiene características asociadas a su 
 
 | Aspecto | Detalle |
 | --- | --- |
-| Nivel de madurez declarado | TRL 4: componentes integrados y validados en laboratorio (equipo local). |
+| Nivel de madurez declarado | TRL 5 con alcance limitado: el sistema integrado (interfaz web, API, extractor, modelo de lenguaje y clasificador) se instaló desde GitHub en una carpeta limpia y se validó en un entorno relevante simulado (equipo de uso común, solo CPU, documentos nuevos en .docx, .pdf y .txt, respuesta en menos de 1 s tras la carga inicial). El desempeño de detección **no** está validado con un conjunto externo de textos etiquetados (ver [Limitaciones](#limitaciones)). |
 | Qué incluye | Interfaz web para subir un documento (.docx, .pdf o .txt) o pegar un texto, API REST (`/salud`, `/clasificar`, `/clasificar-archivo`), extractor de 6 características, perplejidad con un GPT-2 en español, clasificador de regresión logística con línea base, umbrales calibrados («baja probabilidad», «indeterminado», «alta probabilidad»), 37 pruebas automáticas e informe de evaluación. |
-| Qué no incluye | Despliegue en servidor, validación con usuarios reales ni con textos mezclados (humano + IA). |
+| Qué no incluye | Despliegue en servidor, validación con usuarios reales, validación de la exactitud con textos externos etiquetados ni con textos mezclados (humano + IA). |
 | Corpus | No se publica (ver [Corpus](#corpus)). Sí se publican la ficha, los scripts que lo construyen y el modelo entrenado. |
 
 ## Resultados de la prueba de concepto
