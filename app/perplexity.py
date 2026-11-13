@@ -2,8 +2,7 @@
 import math
 import os
 
-NOMBRE_POR_DEFECTO = "PlanTL-GOB-ES/gpt2-base-bne"
-
+NOMBRE_POR_DEFECTO = "DeepESP/gpt2-spanish"
 
 class PerplejidadLM:
     def __init__(self, nombre=None, max_tokens=128):

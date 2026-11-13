@@ -9,7 +9,7 @@ python -m venv .venv
 .venv\Scripts\activate        # en Linux/Mac: source .venv/bin/activate
 pip install -r requirements.txt
 ```
-La primera vez que se usa la perplejidad se descarga el modelo `PlanTL-GOB-ES/gpt2-base-bne` (necesita internet).
+La primera vez que se usa la perplejidad se descarga el modelo `DeepESP/gpt2-spanish` (necesita internet).
 
 ## Pruebas automatizadas
 ```
