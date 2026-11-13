@@ -51,9 +51,16 @@ def crear_app(modelo=None, lm=None, modelo_path=None):
         return servicio.clasificar(s.texto, m, estado["lm"])
 
     @app.post("/clasificar-archivo")
-    async def clasificar_archivo(archivo: UploadFile = File(...)):
-        texto = documentos.leer_documento(archivo.filename, await archivo.read())
-        return servicio.clasificar_documento(texto, cargar(), estado["lm"])
+    def clasificar_archivo(archivo: UploadFile = File(...)):
+        # def (no async): FastAPI lo ejecuta en un hilo y el servidor sigue respondiendo mientras analiza.
+        print(f"[documento] recibido: {archivo.filename}", flush=True)
+        texto = documentos.leer_documento(archivo.filename, archivo.file.read())
+        print(f"[documento] leído: {len(texto.split())} palabras; cargando modelo...", flush=True)
+        modelo = cargar()
+        print("[documento] modelo listo; analizando...", flush=True)
+        r = servicio.clasificar_documento(texto, modelo, estado["lm"])
+        print(f"[documento] listo en {r['tiempo_ms'] / 1000:.1f} s", flush=True)
+        return r
 
     @app.get("/", response_class=HTMLResponse, include_in_schema=False)
     def inicio():

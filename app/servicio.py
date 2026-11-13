@@ -72,6 +72,7 @@ def clasificar_documento(texto, modelo, lm=None):
     bloques, truncado = documentos.dividir_bloques(texto)   # el idioma se verifica bloque a bloque
     resultados, omitidos = [], 0
     for i, b in enumerate(bloques, 1):
+        print(f"[documento] analizando bloque {i} de {len(bloques)}...", flush=True)
         try:
             r = clasificar(b, modelo, lm)
         except ErrorApi as e:

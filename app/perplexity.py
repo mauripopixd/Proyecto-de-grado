@@ -13,7 +13,9 @@ class PerplejidadLM:
         self.max_tokens = max_tokens
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.tok = AutoTokenizer.from_pretrained(self.nombre)
-        self.modelo = AutoModelForCausalLM.from_pretrained(self.nombre).to(self.device).eval()
+        # .float(): las versiones nuevas de transformers cargan los pesos en el tipo del archivo (aquí float16),
+        # lo que en CPU es cientos de veces más lento; el modelo se entrenó con float32.
+        self.modelo = AutoModelForCausalLM.from_pretrained(self.nombre).float().to(self.device).eval()
 
     def perplejidades(self, oraciones):
         res = []

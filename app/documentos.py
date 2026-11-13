@@ -29,7 +29,14 @@ def _pdf(datos):
         lector = PdfReader(io.BytesIO(datos))
         if lector.is_encrypted:
             raise ErrorApi("archivo_protegido", "El PDF está protegido con contraseña.")
-        return "\n".join((p.extract_text() or "") for p in lector.pages)
+        partes, palabras = [], 0
+        for pagina in lector.pages:               # se detiene al reunir texto suficiente (documentos de cientos de páginas)
+            t = pagina.extract_text() or ""
+            partes.append(t)
+            palabras += len(t.split())
+            if palabras >= (MAX_BLOQUES + 1) * BLOQUE:
+                break
+        return "\n".join(partes)
     except ErrorApi:
         raise
     except Exception:

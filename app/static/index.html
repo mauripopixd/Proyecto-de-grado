@@ -82,14 +82,17 @@ $("analizar").addEventListener("click", async () => {
   const origen = f ? "Archivo analizado: " + f.name : "Texto pegado analizado";
   if (f) datos.append("archivo", f);
   else datos.append("archivo", new Blob([t], { type: "text/plain" }), "texto.txt");
-  const boton = $("analizar"); boton.disabled = true; boton.textContent = "Analizando… (la primera vez puede tardar un minuto)";
+  const boton = $("analizar"); boton.disabled = true;
+  const inicio = Date.now();
+  const reloj = setInterval(() => { boton.textContent = "Analizando… " + Math.round((Date.now() - inicio) / 1000) + " s (la primera vez puede tardar más)"; }, 500);
+  boton.textContent = "Analizando…";
   try {
     const r = await fetch("/clasificar-archivo", { method: "POST", body: datos });
     const d = await r.json();
     if (!r.ok) { $("error").textContent = (d.error && d.error.mensaje) || "No se pudo analizar el documento."; return; }
     mostrar(d, origen);
   } catch (e) { $("error").textContent = "No se pudo conectar con el servicio."; }
-  finally { boton.disabled = false; boton.textContent = "Analizar"; }
+  finally { clearInterval(reloj); boton.disabled = false; boton.textContent = "Analizar"; }
 });
 
 function mostrar(d, origen) {
