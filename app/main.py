@@ -1,6 +1,9 @@
 """API: GET /salud y POST /clasificar. Documentación interactiva en /docs.
 Arranque: uvicorn app.main:app"""
 import os
+import threading
+import webbrowser
+from contextlib import asynccontextmanager
 
 import joblib
 from pathlib import Path
@@ -13,12 +16,23 @@ from pydantic import BaseModel
 from . import documentos, servicio
 
 
+ESPERA_NAVEGADOR = 1.5   # segundos entre el arranque del servicio y la apertura del navegador
+
+
+@asynccontextmanager
+async def _ciclo_de_vida(app):
+    # iniciar.bat / iniciar.sh definen ABRIR_NAVEGADOR=1: el navegador se abre cuando el servicio ya está activo.
+    if os.getenv("ABRIR_NAVEGADOR") == "1":
+        threading.Timer(ESPERA_NAVEGADOR, webbrowser.open, args=("http://127.0.0.1:8000",)).start()
+    yield
+
+
 class Solicitud(BaseModel):
     texto: str
 
 
 def crear_app(modelo=None, lm=None, modelo_path=None):
-    app = FastAPI(title="Detector de texto generado por IA (prototipo)", version="0.1")
+    app = FastAPI(title="Detector de texto generado por IA (prototipo)", version="0.1", lifespan=_ciclo_de_vida)
     estado = {"modelo": modelo, "lm": lm, "intentado": modelo is not None}
 
     def cargar():

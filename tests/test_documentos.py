@@ -82,3 +82,14 @@ def test_documento_con_bloques_en_ingles_no_se_rechaza_completo(cliente):
     mezcla = TEXTO_INGLES * 3 + " " + TEXTO_VALIDO * 3  # el global tiene mucho texto en inglés
     r = cliente.post("/clasificar-archivo", files={"archivo": ("m.txt", mezcla.encode(), "text/plain")})
     assert r.status_code == 200 and r.json()["palabras_analizadas"] > 100
+
+
+def test_el_navegador_se_abre_cuando_el_servicio_esta_activo(monkeypatch):
+    import threading
+    from app import main
+    abierto = threading.Event()
+    monkeypatch.setenv("ABRIR_NAVEGADOR", "1")
+    monkeypatch.setattr(main, "ESPERA_NAVEGADOR", 0)
+    monkeypatch.setattr(main.webbrowser, "open", lambda url: abierto.set())
+    with TestClient(crear_app(modelo=modelo_sintetico(), lm=LMFalso())):
+        assert abierto.wait(2)

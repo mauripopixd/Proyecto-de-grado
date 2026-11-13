@@ -9,7 +9,7 @@ Estima si un texto académico en español tiene características asociadas a su 
 | Aspecto | Detalle |
 | --- | --- |
 | Nivel de madurez declarado | TRL 4: componentes integrados y validados en laboratorio (equipo local). |
-| Qué incluye | Interfaz web para subir un documento (.docx, .pdf o .txt) o pegar un texto, API REST (`/salud`, `/clasificar`, `/clasificar-archivo`), extractor de 6 características, perplejidad con un GPT-2 en español, clasificador de regresión logística con línea base, umbrales calibrados («baja probabilidad», «indeterminado», «alta probabilidad»), 36 pruebas automáticas e informe de evaluación. |
+| Qué incluye | Interfaz web para subir un documento (.docx, .pdf o .txt) o pegar un texto, API REST (`/salud`, `/clasificar`, `/clasificar-archivo`), extractor de 6 características, perplejidad con un GPT-2 en español, clasificador de regresión logística con línea base, umbrales calibrados («baja probabilidad», «indeterminado», «alta probabilidad»), 37 pruebas automáticas e informe de evaluación. |
 | Qué no incluye | Despliegue en servidor, validación con usuarios reales ni con textos mezclados (humano + IA). |
 | Corpus | No se publica (ver [Corpus](#corpus)). Sí se publican la ficha, los scripts que lo construyen y el modelo entrenado. |
 
@@ -85,7 +85,7 @@ Errores controlados: texto con menos de 100 o más de 1.000 palabras (422), text
 python -m pytest
 ```
 
-Son 36 pruebas (extractor, modelado, servicio, lectura de documentos y API) y se ejecutan sin descargar el modelo de lenguaje.
+Son 37 pruebas (extractor, modelado, servicio, lectura de documentos y API) y se ejecutan sin descargar el modelo de lenguaje.
 
 ## Modelo de demostración (opcional)
 
