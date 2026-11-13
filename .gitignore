@@ -1,0 +1,6 @@
+data/corpus/
+data/caracteristicas.csv
+models/*.joblib
+__pycache__/
+.venv/
+*.pyc
